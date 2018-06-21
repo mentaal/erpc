@@ -39,8 +39,10 @@
 #include <netdb.h>
 #include <signal.h>
 #include <string>
+#include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 using namespace erpc;
@@ -52,9 +54,11 @@ using namespace erpc;
 #if TCP_TRANSPORT_DEBUG_LOG
 #define TCP_DEBUG_PRINT(_fmt_, ...) printf(_fmt_, ##__VA_ARGS__)
 #define TCP_DEBUG_ERR(_msg_) err(errno, _msg_)
+#define TCP_DEBUG_WARN(_msg_) warn(_msg_)
 #else
 #define TCP_DEBUG_PRINT(_fmt_, ...)
 #define TCP_DEBUG_ERR(_msg_)
+#define TCP_DEBUG_WARN(_msg_)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,8 +70,12 @@ TCPTransport::TCPTransport(bool isServer)
 , m_host(NULL)
 , m_port(0)
 , m_socket(-1)
+#if ERPC_THREADS
 , m_serverThread(serverThreadStub)
 , m_runServer(true)
+#else
+, m_serverSocket(-1)
+#endif // #if ERPC_THREADS
 {
 }
 
@@ -76,8 +84,12 @@ TCPTransport::TCPTransport(const char *host, uint16_t port, bool isServer)
 , m_host(host)
 , m_port(port)
 , m_socket(-1)
+#if ERPC_THREADS
 , m_serverThread(serverThreadStub)
 , m_runServer(true)
+#else
+, m_serverSocket(-1)
+#endif // #if ERPC_THREADS
 {
 }
 
@@ -93,8 +105,63 @@ erpc_status_t TCPTransport::open(void)
 {
     if (m_isServer)
     {
+#if ERPC_THREADS
         m_runServer = true;
         m_serverThread.start(this);
+#else
+        // Create socket.
+        m_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+        if (m_serverSocket < 0)
+        {
+            TCP_DEBUG_ERR("failed to create server socket");
+            return kErpcStatus_Fail;
+        }
+
+        // Fill in address struct.
+        struct sockaddr_in serverAddress;
+        memset(&serverAddress, 0, sizeof(serverAddress));
+        serverAddress.sin_family = AF_INET;
+        serverAddress.sin_addr.s_addr = INADDR_ANY; // htonl(local ? INADDR_LOOPBACK : INADDR_ANY);
+        serverAddress.sin_port = htons(m_port);
+
+        // Turn on reuse address option.
+        int yes = 1;
+        int result = setsockopt(m_serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+        if (result < 0)
+        {
+            TCP_DEBUG_ERR("setsockopt failed");
+            ::close(m_serverSocket);
+            return kErpcStatus_Fail;
+        }
+        result = setsockopt(m_serverSocket, SOL_TCP, TCP_NODELAY, &yes, sizeof(yes));
+        if (result < 0)
+        {
+            TCP_DEBUG_ERR("setsockopt failed");
+            ::close(m_serverSocket);
+            return kErpcStatus_Fail;
+        }
+
+        // Bind socket to address.
+        result = bind(m_serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
+        if (result < 0)
+        {
+            TCP_DEBUG_ERR("bind failed");
+            ::close(m_serverSocket);
+            return kErpcStatus_Fail;
+        }
+
+        // Listen for connections.
+        result = listen(m_serverSocket, 1);
+        if (result < 0)
+        {
+            TCP_DEBUG_ERR("listen failed");
+            ::close(m_serverSocket);
+            return kErpcStatus_Fail;
+        }
+
+        TCP_DEBUG_PRINT("Listening for connections\n");
+#endif // #if ERPC_THREADS
+
         return kErpcStatus_Success;
     }
     else
@@ -190,13 +257,17 @@ erpc_status_t TCPTransport::connectClient(void)
 
 erpc_status_t TCPTransport::close(void)
 {
+#if ERPC_THREADS
     if (m_isServer)
     {
         m_runServer = false;
+        TCP_DEBUG_PRINT("Shutting down server\n");
     }
+#endif // #if ERPC_THREADS
 
     if (m_socket != -1)
     {
+        TCP_DEBUG_PRINT("Closing socket...\n");
         ::close(m_socket);
         m_socket = -1;
     }
@@ -206,19 +277,21 @@ erpc_status_t TCPTransport::close(void)
 
 erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
+#if ERPC_THREADS
     // Block until we have a valid connection.
     while (m_socket <= 0)
     {
         // Sleep 10 ms.
         Thread::sleep(10000);
     }
+#endif // #if ERPC_THREADS
 
     ssize_t length = 0;
 
     // Loop until all requested data is received.
     while (size)
     {
-        length = read(m_socket, data, size);
+        length = recv(m_socket, data, size, 0);
 
         // Length will be zero if the connection is closed.
         if (length == 0)
@@ -228,6 +301,7 @@ erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
         }
         else if (length < 0)
         {
+            TCP_DEBUG_WARN("Receive Failed ");
             return kErpcStatus_ReceiveFailed;
         }
         else
@@ -250,7 +324,7 @@ erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
     // Loop until all data is sent.
     while (size)
     {
-        ssize_t result = write(m_socket, data, size);
+        ssize_t result = ::send(m_socket, data, size, 0);
         if (result >= 0)
         {
             size -= result;
@@ -271,7 +345,8 @@ erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
     return kErpcStatus_Success;
 }
 
-void TCPTransport::serverThread(void)
+#if ERPC_THREADS
+void TCPTransport::serverThread()
 {
     TCP_DEBUG_PRINT("in server thread\n");
 
@@ -299,6 +374,13 @@ void TCPTransport::serverThread(void)
         ::close(serverSocket);
         return;
     }
+    result = setsockopt(serverSocket, SOL_TCP, TCP_NODELAY, &yes, sizeof(yes));
+    if (result < 0)
+    {
+        TCP_DEBUG_ERR("setsockopt failed");
+        ::close(serverSocket);
+        return kErpcStatus_Fail;
+    }
 
     // Bind socket to address.
     result = bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
@@ -323,10 +405,15 @@ void TCPTransport::serverThread(void)
     while (m_runServer)
     {
         struct sockaddr incomingAddress;
-        socklen_t incomingAddressLength;
-        int incomingSocket = accept(serverSocket, &incomingAddress, &incomingAddressLength);
+        socklen_t incomingAddressLength = sizeof(struct sockaddr);
+        int incomingSocket = ::accept(serverSocket, &incomingAddress, &incomingAddressLength);
+
+
         if (incomingSocket > 0)
         {
+            struct sockaddr_in *addr_in = reinterpret_cast<struct sockaddr_in *>(&incomingAddress);
+            char *s = inet_ntoa(addr_in->sin_addr);
+            TCP_DEBUG_PRINT("Received a connection from: %s\n", s);
             // Successfully accepted a connection.
             m_socket = incomingSocket;
         }
@@ -348,3 +435,45 @@ void TCPTransport::serverThreadStub(void *arg)
         This->serverThread();
     }
 }
+#else
+erpc_status_t TCPTransport::receive(MessageBuffer *message)
+{
+    /* first accept a new connection if required */
+    erpc_status_t result = accept();
+    if (result != kErpcStatus_Success)
+    {
+        TCP_DEBUG_ERR("Failed on tcp accept\n");
+        return result;
+    }
+
+    return FramedTransport::receive(message);
+}
+erpc_status_t TCPTransport::accept(void)
+{
+    if (m_socket > 0) // connection is still active so keep using it
+    {
+        return kErpcStatus_Success;
+    }
+    struct sockaddr incomingAddress;
+    socklen_t incomingAddressLength = sizeof(struct sockaddr);
+    int incomingSocket = ::accept(m_serverSocket, &incomingAddress, &incomingAddressLength);
+
+
+    if (incomingSocket > 0)
+    {
+        struct sockaddr_in *addr_in = reinterpret_cast<struct sockaddr_in *>(&incomingAddress);
+        char *s = inet_ntoa(addr_in->sin_addr);
+        TCP_DEBUG_PRINT("Received a connection from: %s\n", s);
+        // Successfully accepted a connection.
+        m_socket = incomingSocket;
+    }
+    else
+    {
+        TCP_DEBUG_ERR("accept failed");
+        return kErpcStatus_Fail;
+    }
+
+    return kErpcStatus_Success;
+}
+
+#endif // #if ERPC_THREADS

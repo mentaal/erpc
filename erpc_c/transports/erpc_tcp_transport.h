@@ -111,8 +111,12 @@ protected:
     const char *m_host;    /*!< Specify the host name or IP address of the computer. */
     uint16_t m_port;       /*!< Specify the listening port number. */
     int m_socket;          /*!< Socket number. */
+#if ERPC_THREADS
     Thread m_serverThread; /*!< Pointer to server thread. */
     bool m_runServer;      /*!< Thread is executed while this is true. */
+#else
+    int m_serverSocket;      /*!< Server socket number*/
+#endif // #if ERPC_THREADS
 
     /*!
      * @brief This function connect client to the server.
@@ -146,6 +150,7 @@ protected:
      */
     virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
 
+#if ERPC_THREADS
     /*!
      * @brief Server thread function.
      */
@@ -161,6 +166,33 @@ protected:
      *  this argument.
      */
     static void serverThreadStub(void *arg);
+#else
+    /*!
+     * @brief This function calls socket accept() to wait for next connection
+     *
+     * @retval kErpcStatus_Success When client connected successfully.
+     * @retval kErpcStatus_Fail When accept() fails
+     */
+    virtual erpc_status_t accept(void);
+
+    /*!
+     * @brief Override of receive which first accepts a new connection
+     *
+     * Same as base class except that accept is called first, then base class
+     * receive is called.
+     *
+     * The @a message is only filled with the message data, not the frame header.
+     *
+     * This function is blocking.
+     *
+     * @param[in] message Message buffer, to which will be stored incoming message.
+     *
+     * @retval kErpcStatus_Success When receiving was successful.
+     * @retval kErpcStatus_CrcCheckFailed When receiving failed.
+     * @retval other Subclass may return other errors from the underlyingReceive() method.
+     */
+    virtual erpc_status_t receive(MessageBuffer *message) override;
+#endif //#if ERPC_THREADS
 };
 
 } // namespace erpc
