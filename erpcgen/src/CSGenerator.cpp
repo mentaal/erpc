@@ -104,11 +104,11 @@ void CSGenerator::generateOutputFiles(const string &fileName)
 void CSGenerator::generateTypesHeaderFile()
 {
     string typesHeaderFileName = m_templateData["commonTypesFile"]->getvalue();
-	std::size_t found = typesHeaderFileName.find(".h");
-	if (found > 0) {
-		string st = typesHeaderFileName.substr(0, found);
-		typesHeaderFileName = st + ".cs";
-	}
+    std::size_t found = typesHeaderFileName.find(".h");
+    if (found > 0) {
+        string st = typesHeaderFileName.substr(0, found);
+        typesHeaderFileName = st + ".cs";
+    }
     m_templateData["genCommonTypesFile"] = true;
     m_templateData["commonTypesFile"] = "";
 
@@ -501,7 +501,7 @@ void CSGenerator::generate()
 
     makeEnumsTemplateData();
 
-	makeSymbolsDeclarationTemplateData();
+    makeSymbolsDeclarationTemplateData();
 
     // check if types header annotation is used
     if (m_def->hasProgramSymbol())
@@ -526,11 +526,11 @@ void CSGenerator::generate()
         generateGroupOutputFiles(group);
     }
 
-	// generate types header if used
-	if (!m_templateData["commonTypesFile"]->getvalue().empty())
-	{
-		generateTypesHeaderFile();
-	}
+    // generate types header if used
+    if (!m_templateData["commonTypesFile"]->getvalue().empty())
+    {
+        generateTypesHeaderFile();
+    }
 }
 
 void CSGenerator::makeConstTemplateData()
@@ -1220,10 +1220,10 @@ data_map CSGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn
     listCounter = 0;
 
     info["adiApi"] = false;
-	Annotation *ann = findAnnotation(fnSymbol, ADI_API_ANNOTATION);
-	if (ann) {
-		info["adiApi"] = true;
-	}
+    Annotation *ann = findAnnotation(fnSymbol, ADI_API_ANNOTATION);
+    if (ann) {
+        info["adiApi"] = true;
+    }
     info["isOneway"] = fn->isOneway();
     info["isReturnValue"] = !fn->isOneway();
     info["isSendValue"] = false;
@@ -1768,13 +1768,13 @@ string CSGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTy
     auto params = (functionType) ? functionType->getParameters().getMembers() : fn->getParameters().getMembers();
 
     Annotation *ann = findAnnotation(fn, ADI_API_ANNOTATION);
-	string hndl_name = (ann) ? ann->getValueObject()->toString() : "dev";
-	BuiltinType adiHndl_t(hndl_name, BuiltinType::kInt32Type); //NCH: ugly workaround.
-	StructMember adiHndl(hndl_name, &adiHndl_t);
-	adiHndl.setDirection(erpcgen::kInoutDirection);
-	if (ann) {
-		params.insert(params.begin(), &adiHndl);
-	}
+    string hndl_name = (ann) ? ann->getValueObject()->toString() : "dev";
+    BuiltinType adiHndl_t(hndl_name, BuiltinType::kInt32Type); //NCH: ugly workaround.
+    StructMember adiHndl(hndl_name, &adiHndl_t);
+    adiHndl.setDirection(erpcgen::kInoutDirection);
+    if (ann) {
+        params.insert(params.begin(), &adiHndl);
+    }
 
     if (params.size())
     {
@@ -1883,7 +1883,7 @@ string CSGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::st
                      trueDataType->isUnion()) &&
                     it->getDirection() == kInDirection)
                 {
-					//const
+                    //const
                     proto += "";
                 }
             }
@@ -2016,12 +2016,12 @@ string CSGenerator::getTypenameName(DataType *t, const string &name)
         case DataType::kStructType:
         {
             returnName = getOutputName(t);
-			if (name[0] == '*') {
-				returnName = "ref " + returnName + name.substr(1);
-			}
-			else {
-				returnName += returnSpaceWhenNotEmpty(name) + name;
-			}
+            if (name[0] == '*') {
+                returnName = "ref " + returnName + name.substr(1);
+            }
+            else {
+                returnName += returnSpaceWhenNotEmpty(name) + name;
+            }
             break;
         }
         default:
