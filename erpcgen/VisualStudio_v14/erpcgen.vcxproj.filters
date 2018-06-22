@@ -276,4 +276,7 @@
   <ItemGroup>
     <Text Include="readme_erpcgen.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
