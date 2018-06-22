@@ -35,6 +35,7 @@
 
 #include "erpc_version.h"
 #include "CGenerator.h"
+#include "CSGenerator.h"
 #include "ErpcLexer.h"
 #include "InterfaceDefinition.h"
 #include "Logging.h"
@@ -91,6 +92,7 @@ const char k_usageText[] =
 Available languages (use with -g option):\n\
   c    C/C++\n\
   py   Python\n\
+  cs   C#\n\
 \n\
 Available codecs (use with --c option):\n\
   basic   BasicCodec\n\
@@ -122,6 +124,7 @@ protected:
     {
         kCLanguage,
         kPythonLanguage,
+        kCSLanguage,
     }; /*!< Generated outputs format. */
 
     typedef vector<string> string_vector_t; /*!< Vector of positional arguments. */
@@ -227,6 +230,10 @@ public:
                     else if (lang == "py")
                     {
                         m_outputLanguage = kPythonLanguage;
+                    }
+                    else if (lang == "cs")
+                    {
+                        m_outputLanguage = kCSLanguage;
                     }
                     else
                     {
@@ -343,6 +350,9 @@ public:
                     break;
                 case kPythonLanguage:
                     PythonGenerator(&def).generate();
+                    break;
+                case kCSLanguage:
+                    CSGenerator(&def).generate();
                     break;
             }
         }

@@ -103,6 +103,13 @@ python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
 python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
+python.exe ..\bin\txt_to_c.py --output .\cs_coders.cpp ..\src\templates\cs_coders.template
+python.exe ..\bin\txt_to_c.py --output .\cs_client_source.cpp ..\src\templates\cs_client_source.template
+python.exe ..\bin\txt_to_c.py --output .\cs_common_header.cpp ..\src\templates\cs_common_header.template
+python.exe ..\bin\txt_to_c.py --output .\cs_server_source.cpp ..\src\templates\cs_server_source.template
+python.exe ..\bin\txt_to_c.py --output .\cs_server_header.cpp ..\src\templates\cs_server_header.template
+python.exe ..\bin\txt_to_c.py --output .\cs_common_functions.cpp ..\src\templates\cs_common_functions.template
+python.exe ..\bin\txt_to_c.py --output .\cs_crc.cpp ..\src\templates\cs_crc.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
 python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_common.template
@@ -142,6 +149,13 @@ python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
 python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
+python.exe ..\bin\txt_to_c.py --output .\cs_coders.cpp ..\src\templates\cs_coders.template
+python.exe ..\bin\txt_to_c.py --output .\cs_client_source.cpp ..\src\templates\cs_client_source.template
+python.exe ..\bin\txt_to_c.py --output .\cs_common_header.cpp ..\src\templates\cs_common_header.template
+python.exe ..\bin\txt_to_c.py --output .\cs_server_source.cpp ..\src\templates\cs_server_source.template
+python.exe ..\bin\txt_to_c.py --output .\cs_server_header.cpp ..\src\templates\cs_server_header.template
+python.exe ..\bin\txt_to_c.py --output .\cs_common_functions.cpp ..\src\templates\cs_common_functions.template
+python.exe ..\bin\txt_to_c.py --output .\cs_crc.cpp ..\src\templates\cs_crc.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
 python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_common.template
@@ -162,6 +176,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     <ClInclude Include="..\..\erpc_c\infra\erpc_crc16.h" />
     <ClInclude Include="..\..\erpc_c\infra\erpc_version.h" />
     <ClInclude Include="..\src\annotations.h" />
+    <ClInclude Include="..\src\CSGenerator.h" />
     <ClInclude Include="..\src\format_string.h" />
     <ClInclude Include="..\src\HexValues.h" />
     <ClInclude Include="..\src\Logging.h" />
@@ -206,6 +221,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\erpc_c\infra\erpc_crc16.cpp" />
+    <ClCompile Include="..\src\CSGenerator.cpp" />
     <ClCompile Include="..\src\format_string.cpp" />
     <ClCompile Include="..\src\HexValues.cpp" />
     <ClCompile Include="..\src\Logging.cpp" />
@@ -225,6 +241,13 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     <ClCompile Include="..\src\Token.cpp" />
     <ClCompile Include="..\src\types\Type.cpp" />
     <ClCompile Include="..\src\UniqueIdChecker.cpp" />
+    <ClCompile Include="cs_client_source.cpp" />
+    <ClCompile Include="cs_coders.cpp" />
+    <ClCompile Include="cs_common_functions.cpp" />
+    <ClCompile Include="cs_common_header.cpp" />
+    <ClCompile Include="cs_crc.cpp" />
+    <ClCompile Include="cs_server_header.cpp" />
+    <ClCompile Include="cs_server_source.cpp" />
     <ClCompile Include="c_client_source.cpp" />
     <ClCompile Include="c_coders.cpp" />
     <ClCompile Include="c_common_header.cpp" />

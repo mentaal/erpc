@@ -19,6 +19,13 @@ py_init.cpp
 py_server.cpp
 py_interface.cpp
 py_global_init.cpp
+cs_client_source.cpp
+cs_coders.cpp
+cs_common_functions.cpp
+cs_common_header.cpp
+cs_crc.cpp
+cs_server_header.cpp
+cs_server_source.cpp
 
 # win flex-bison files
 data

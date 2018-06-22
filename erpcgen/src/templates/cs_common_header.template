@@ -1,0 +1,71 @@
+{% if mlComment != ""%}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+using System;
+
+
+namespace erpc
+{
+{% if commonTypesFile == "" %}
+{% if not empty(enums) %}
+    // Enumerators data types declarations
+{%  for enum in enums %}
+{% if enum.name != "" %}
+{% endif %}
+{$addIndent("    ", enum.mlComment)}
+    public enum{$addIndent(" ", enum.name)}
+    {
+{%   for enumMember in enum.members %}
+{$addIndent("        ", enumMember.mlComment)}
+{$addIndent("        ", enumMember.memberDeclaration)}{$enumMember.ilComment}
+{%   endfor -- enumsMembers %}
+    };{$enum.ilComment}{$loop.addNewLineIfNotLast}
+{%  endfor -- enums %}
+{% endif -- enums %}
+
+{% if nonExternalStructUnion %}
+    // Structures data types declarations
+{%  for us in symbols %}
+{%   if !us.isExternal %}
+{%    if us.type == "struct" %}
+{$addIndent("    ", us.mlComment)}
+    public class {$us.name}
+    {
+{%     for mem in us.members %}
+{$addIndent("        ", mem.mlComment)}
+        public {$mem.memberDeclaration}{$mem.ilComment}
+{$addIndent("        ", mem.elementsCount)}
+{%     endfor %}
+    };{$us.ilComment}{$loop.addNewLineIfNotLast}
+{%    else -- us.type == "union" %}
+
+{$addIndent("    ", us.mlComment)}
+    union {$us.name}
+    {
+{$addIndent("        ", unionMembersDeclaration(us))}
+    };{$us.ilComment}{$loop.addNewLineIfNotLast}
+{%    endif -- us.type == "union/struct" %}
+{%   endif -- !us.isExternal %}
+{%  endfor -- symbols %}
+
+{% endif -- nonExternalStruct || nonExternalUnion %}
+
+{% endif -- commonTypesFile %}
+
+{% if not genCommonTypesFile %}
+{% for iface in group.interfaces %}
+    /*! @brief {$iface.name} identifiers */
+    enum _{$iface.name}_ids
+    {
+        k{$iface.name}_service_id = {$iface.id},
+{%  for fn in iface.functions %}
+        k{$iface.name}_{$fn.name}_id = {$fn.id},
+{%  endfor %}
+    };
+{% endfor %}
+
+{% endif -- genCommonTypesFile %}
+
+}

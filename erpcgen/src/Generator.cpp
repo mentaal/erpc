@@ -606,6 +606,10 @@ Annotation::program_lang_t Generator::getAnnotationLang()
     {
         return Annotation::kPython;
     }
+    else if (m_generatorType == kCS)
+    {
+        return Annotation::kCS;
+    }
 
     throw internal_error("Unsupported generator type specified for annotation.");
 }

@@ -72,7 +72,8 @@ public:
     enum generator_type_t
     {
         kC,
-        kPython
+        kPython,
+        kCS
     }; /*!< Type of generator. */
 
     /*!

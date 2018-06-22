@@ -57,7 +57,8 @@ public:
     {
         kAll,
         kC,
-        kPython
+        kPython,
+        kCS,
     };
 
     /*!
