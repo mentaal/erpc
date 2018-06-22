@@ -60,6 +60,7 @@ public:
     {
         kNotSpecified,
         kBasicCodec,
+        kWideCodec,
     }; /*!< Used codec type. */
 
     /*!

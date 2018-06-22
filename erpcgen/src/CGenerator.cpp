@@ -2431,7 +2431,8 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
 
             // To improve code serialization/deserialization for scalar types when BasicCodec is used.
             templateData["builtinTypeName"] =
-                ((m_def->getCodecType() != InterfaceDefinition::kBasicCodec) || trueElementType->isBool()) ?
+                ((m_def->getCodecType() != InterfaceDefinition::kBasicCodec) ||
+                 (m_def->getCodecType() != InterfaceDefinition::kWideCodec) || trueElementType->isBool()) ?
                     "" :
                     getScalarTypename(elementType);
 
@@ -2521,7 +2522,8 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
 
             // To improve code serialization/deserialization for scalar types when BasicCodec is used.
             templateData["builtinTypeName"] =
-                ((m_def->getCodecType() != InterfaceDefinition::kBasicCodec) || trueElementType->isBool()) ?
+                ((m_def->getCodecType() != InterfaceDefinition::kBasicCodec) ||
+                 (m_def->getCodecType() != InterfaceDefinition::kWideCodec) ||  trueElementType->isBool()) ?
                     "" :
                     getScalarTypename(elementType);
 

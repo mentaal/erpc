@@ -96,6 +96,7 @@ Available languages (use with -g option):\n\
 \n\
 Available codecs (use with --c option):\n\
   basic   BasicCodec\n\
+  wide    WideCodec\n\
 \n";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,6 +250,10 @@ public:
                     if (codec.compare("basic") == 0)
                     {
                         m_codec = InterfaceDefinition::kBasicCodec;
+                    }
+                    else if (codec.compare("wide") == 0)
+                    {
+                        m_codec = InterfaceDefinition::kWideCodec;
                     }
                     else
                     {
