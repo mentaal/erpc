@@ -227,7 +227,7 @@ namespace erpc {
         {
             byte[] ba = new byte[2];
             readData(ba);
-			if (m_status == erpc_status.kErpcStatus_Success)
+            if (m_status == erpc_status.kErpcStatus_Success)
             {
                 value = BitConverter.ToInt16(ba, 0);
             }
@@ -237,7 +237,7 @@ namespace erpc {
         {
             byte[] ba = new byte[4];
             readData(ba);
-			if (m_status == erpc_status.kErpcStatus_Success)
+            if (m_status == erpc_status.kErpcStatus_Success)
             {
                 value = BitConverter.ToInt32(ba, 0);
             }
@@ -247,7 +247,7 @@ namespace erpc {
         {
             byte[] ba = new byte[8];
             readData(ba);
-			if (m_status == erpc_status.kErpcStatus_Success)
+            if (m_status == erpc_status.kErpcStatus_Success)
             {
                 value = BitConverter.ToInt64(ba, 0);
             }
@@ -257,7 +257,7 @@ namespace erpc {
         {
             byte[] ba = new byte[2];
             readData(ba);
-			if (m_status == erpc_status.kErpcStatus_Success)
+            if (m_status == erpc_status.kErpcStatus_Success)
             {
                 value = BitConverter.ToUInt16(ba, 0);
             }
@@ -267,7 +267,7 @@ namespace erpc {
         {
             byte[] ba = new byte[4];
             readData(ba);
-			if (m_status == erpc_status.kErpcStatus_Success)
+            if (m_status == erpc_status.kErpcStatus_Success)
             {
                 value = BitConverter.ToUInt32(ba, 0);
             }
@@ -277,7 +277,7 @@ namespace erpc {
         {
             byte[] ba = new byte[8];
             readData(ba);
-			if (m_status == erpc_status.kErpcStatus_Success)
+            if (m_status == erpc_status.kErpcStatus_Success)
             {
                 value = BitConverter.ToUInt64(ba, 0);
             }
@@ -287,7 +287,7 @@ namespace erpc {
         {
             byte[] ba = new byte[8];
             readData(ba);
-			if (m_status == erpc_status.kErpcStatus_Success)
+            if (m_status == erpc_status.kErpcStatus_Success)
             {
                 value = (float)BitConverter.ToDouble(ba, 0);
             }
@@ -297,7 +297,7 @@ namespace erpc {
         {
             byte[] ba = new byte[8];
             readData(ba);
-			if (m_status == erpc_status.kErpcStatus_Success)
+            if (m_status == erpc_status.kErpcStatus_Success)
             {
                 value = BitConverter.ToDouble(ba, 0);
             }
