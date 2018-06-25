@@ -35,12 +35,12 @@
 from .codec import (MessageType, MessageInfo, CodecError)
 from .basic_codec import BasicCodec
 
-class AdiBasicCodec(BasicCodec):
+class WideCodec(BasicCodec):
     ## Version of this codec.
-    ADI_BASIC_CODEC_VERSION = 1
+    WIDE_CODEC_VERSION = 1
 
     def start_write_message(self, msgInfo):
-        header = (self.ADI_BASIC_CODEC_VERSION << 24) \
+        header = (self.WIDE_CODEC_VERSION << 24) \
                         | ((msgInfo.service & 0xff) << 16) \
                         | (msgInfo.sequence & 0xFFFF)
         self.write_uint32(header)
@@ -54,7 +54,7 @@ class AdiBasicCodec(BasicCodec):
     def start_read_message(self):
         header = self.read_uint32()
         version = header >> 24
-        if version != self.ADI_BASIC_CODEC_VERSION:
+        if version != self.WIDE_CODEC_VERSION:
             raise CodecError("unsupported codec version %d" % version)
 
         service = (header >> 16) & 0xFF
