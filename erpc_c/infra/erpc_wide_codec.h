@@ -71,7 +71,7 @@ public:
      * @param[in] sequence Send sequence number to be sure that
      *                    received message is reply for current request. or write function.
      */
-    virtual void startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence);
+    virtual void startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence) override;
 
     //! @name Decoding
     //@{
@@ -101,7 +101,7 @@ public:
      *
      * @return Pointer to created codec.
      */
-    virtual ADIBasicCodec *create(void) override { return new (std::nothrow) WideCodec; }
+    virtual WideCodec *create(void) override { return new (std::nothrow) WideCodec; }
 
     /*!
      * @brief Dispose codec.

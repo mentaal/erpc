@@ -46,19 +46,19 @@ const uint32_t WideCodec::kWideCodecVersion = 1;
 
 void WideCodec::startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence)
 {
-    uint32_t header = (kADIBasicCodecVersion << 24) | ((service & 0xFF) << 16) | (sequence & 0xFFFF);
+    uint32_t header = (kWideCodecVersion << 24) | ((service & 0xFF) << 16) | (sequence & 0xFFFF);
     write(header);
 
     header = ((request & 0xFFFFFF) << 8) | (type & 0xFF);
     write(header);
 }
 
-void ADIBasicCodec::startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence)
+void WideCodec::startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence)
 {
     uint32_t header;
     read(&header);
 
-    sif (((header >> 24) & 0xFF) != kADIBasicCodecVersion)
+    if (((header >> 24) & 0xFF) != kWideCodecVersion)
     {
         updateStatus(kErpcStatus_InvalidMessageVersion);
     }
