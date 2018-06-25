@@ -2,16 +2,16 @@ namespace erpc {
     using System;
     using static MessageBuffer;
 
-    public class AdiBasicCodec : Codec
+    public class WideCodec : Codec
     {
-        public UInt32 kAdiBasicCodecVersion = 2;
+        public UInt32 kWideCodecVersion = 1;
 
-        public AdiBasicCodec() : base() {
+        public WideCodec() : base() {
         }
 
         public override void startWriteMessage(MessageType type, UInt32 service, UInt32 request, UInt32 sequence)
         {
-            UInt32 header = this.kAdiBasicCodecVersion << 24 | ((service & 0xFF) << 16) | (sequence & 0xFFFF);
+            UInt32 header = this.kWideCodecVersion << 24 | ((service & 0xFF) << 16) | (sequence & 0xFFFF);
             this.write(header);
 
             header = ((request & 0xFFFFFF) << 8) | ((UInt32)type & 0xFF);
@@ -171,7 +171,7 @@ namespace erpc {
             UInt32 header=0;
             read(ref header);
 
-            if (((header >> 24) & 0xFF) != kAdiBasicCodecVersion)
+            if (((header >> 24) & 0xFF) != kWideCodecVersion)
             {
                 updateStatus(erpc_status.kErpcStatus_InvalidMessageVersion);
             }
@@ -388,9 +388,9 @@ namespace erpc {
         //        }
     }
 
-    public class AdiBasicCodecFactory : CodecFactory
+    public class WideCodecFactory : CodecFactory
     {
-        public AdiBasicCodecFactory() { }
-        public override Codec create() { return new erpc.AdiBasicCodec(); }
+        public WideCodecFactory() { }
+        public override Codec create() { return new erpc.WideCodec(); }
     }
 }
