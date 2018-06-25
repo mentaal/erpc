@@ -55,7 +55,7 @@ namespace erpc
             public ClientManager()
             {
                 this.m_messageFactory = new MessageBufferFactory();
-                this.m_codecFactory = new AdiBasicCodecFactory();
+                this.m_codecFactory = new WideCodecFactory();
             }
 
             public void setTransport(Transport transport)
