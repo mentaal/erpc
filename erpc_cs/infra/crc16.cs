@@ -6,7 +6,7 @@ namespace erpc {
 
         public CRC16() { }
         public static UInt16 calc(byte[] data, int size) {
-            UInt32 crc = 0x1d0f;
+            UInt32 crc = 0xef4a;
             UInt32 j;
             if (size > data.Length)
             {
